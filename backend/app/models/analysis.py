@@ -12,4 +12,8 @@ class AnalysisRequest(BaseModel):
 
 class AnalysisResponse(BaseModel):
     analysis_id: str
-    status: Literal["queued"]
+    status: Literal["completed"]
+    claims: list[str]
+    competitors: list[str]
+    risk_score: int
+    risk_level: Literal["low", "medium", "high"]
