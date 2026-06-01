@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
+const ANALYSIS_ENDPOINT = "http://127.0.0.1:8000/api/v1/analysis";
+
 const highlights = [
 	"\u2713 Claim Extraction",
 	"\u2713 Competitor Research",
@@ -26,12 +28,42 @@ const industryOptions = [
 	"Other",
 ] as const;
 
+type IndustryOption = (typeof industryOptions)[number];
+
+type AnalysisResult = {
+	analysis_id: string;
+	status: string;
+};
+
+type FormErrors = Partial<{
+	startupName: string;
+	description: string;
+	websiteUrl: string;
+	industry: string;
+}>;
+
+const isValidUrl = (value: string) => {
+	try {
+		new URL(value);
+		return true;
+	} catch {
+		return false;
+ 	}
+};
+
 export default function AnalyzePage() {
 	const comboboxId = useId();
 	const listboxId = useId();
 	const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
 	const dropdownRef = useRef<HTMLDivElement | null>(null);
-	const [industry, setIndustry] = useState<(typeof industryOptions)[number] | "">("");
+	const [startupName, setStartupName] = useState("");
+	const [description, setDescription] = useState("");
+	const [websiteUrl, setWebsiteUrl] = useState("");
+	const [industry, setIndustry] = useState<IndustryOption | "">("");
+	const [errors, setErrors] = useState<FormErrors>({});
+	const [submitError, setSubmitError] = useState("");
+	const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isIndustryOpen, setIsIndustryOpen] = useState(false);
 	const [activeIndustryIndex, setActiveIndustryIndex] = useState(0);
 
@@ -46,9 +78,72 @@ export default function AnalyzePage() {
 		setIsIndustryOpen(false);
 	};
 
-	const selectIndustry = (value: (typeof industryOptions)[number]) => {
+	const selectIndustry = (value: IndustryOption) => {
 		setIndustry(value);
+		setErrors((current) => ({ ...current, industry: undefined }));
 		closeIndustryMenu();
+	};
+
+	const validate = () => {
+		const nextErrors: FormErrors = {};
+
+		if (!startupName.trim()) {
+			nextErrors.startupName = "Startup name is required.";
+		}
+		if (!description.trim()) {
+			nextErrors.description = "Description is required.";
+		}
+		if (!websiteUrl.trim()) {
+			nextErrors.websiteUrl = "Website URL is required.";
+		} else if (!isValidUrl(websiteUrl.trim())) {
+			nextErrors.websiteUrl = "Enter a valid website URL.";
+		}
+		if (!industry) {
+			nextErrors.industry = "Industry is required.";
+		}
+
+		setErrors(nextErrors);
+		return Object.keys(nextErrors).length === 0;
+	};
+
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		setSubmitError("");
+		setAnalysisResult(null);
+
+		if (!validate()) {
+			return;
+		}
+
+		setIsSubmitting(true);
+
+		try {
+			const response = await fetch(ANALYSIS_ENDPOINT, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					startup_name: startupName.trim(),
+					description: description.trim(),
+					website_url: websiteUrl.trim(),
+					industry,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to queue analysis.");
+			}
+
+			const data = (await response.json()) as AnalysisResult;
+			setAnalysisResult(data);
+		} catch {
+			setSubmitError(
+				"We could not start the analysis right now. Please check your connection and try again.",
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	useEffect(() => {
@@ -147,7 +242,35 @@ export default function AnalyzePage() {
 								</div>
 							</div>
 
-							<form className="mt-6 space-y-5">
+							{analysisResult ? (
+								<div className="mt-6 rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-5 shadow-[0_0_40px_rgba(16,185,129,0.10)]">
+									<p className="text-xs uppercase tracking-[0.24em] text-emerald-200/80">
+										Analysis queued
+									</p>
+									<div className="mt-3 grid gap-3 sm:grid-cols-2">
+										<div>
+											<p className="text-sm text-emerald-100/80">Analysis ID</p>
+											<p className="mt-1 break-all text-sm font-medium text-white">
+												{analysisResult.analysis_id}
+											</p>
+										</div>
+										<div>
+											<p className="text-sm text-emerald-100/80">Status</p>
+											<p className="mt-1 text-sm font-medium text-white">
+												{analysisResult.status}
+											</p>
+										</div>
+									</div>
+								</div>
+							) : null}
+
+							{submitError ? (
+								<div className="mt-6 rounded-3xl border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-100">
+									{submitError}
+								</div>
+							) : null}
+
+							<form className="mt-6 space-y-5" onSubmit={handleSubmit}>
 								<div className="grid gap-5 sm:grid-cols-2">
 									<label className="space-y-2 sm:col-span-2">
 										<span className="text-sm font-medium text-slate-200">
@@ -156,8 +279,20 @@ export default function AnalyzePage() {
 										<input
 											type="text"
 											placeholder="e.g. Northstar AI"
+											value={startupName}
+											onChange={(event) => {
+												setStartupName(event.target.value);
+												setErrors((current) => ({ ...current, startupName: undefined }));
+											}}
+											aria-invalid={Boolean(errors.startupName)}
+											aria-describedby={errors.startupName ? "startup-name-error" : undefined}
 											className="h-12 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20"
 										/>
+										{errors.startupName ? (
+											<p id="startup-name-error" className="text-sm text-rose-200">
+												{errors.startupName}
+											</p>
+										) : null}
 									</label>
 
 									<label className="space-y-2 sm:col-span-2">
@@ -167,8 +302,20 @@ export default function AnalyzePage() {
 										<textarea
 											placeholder="Describe the product, market, traction, or any specific diligence angle you want Prism to focus on."
 											rows={5}
+											value={description}
+											onChange={(event) => {
+												setDescription(event.target.value);
+												setErrors((current) => ({ ...current, description: undefined }));
+											}}
+											aria-invalid={Boolean(errors.description)}
+											aria-describedby={errors.description ? "startup-description-error" : undefined}
 											className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20"
 										/>
+										{errors.description ? (
+											<p id="startup-description-error" className="text-sm text-rose-200">
+												{errors.description}
+											</p>
+										) : null}
 									</label>
 
 									<label className="space-y-2 sm:col-span-2">
@@ -178,8 +325,20 @@ export default function AnalyzePage() {
 										<input
 											type="url"
 											placeholder="https://company.com"
+											value={websiteUrl}
+											onChange={(event) => {
+												setWebsiteUrl(event.target.value);
+												setErrors((current) => ({ ...current, websiteUrl: undefined }));
+											}}
+											aria-invalid={Boolean(errors.websiteUrl)}
+											aria-describedby={errors.websiteUrl ? "website-url-error" : undefined}
 											className="h-12 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20"
 										/>
+										{errors.websiteUrl ? (
+											<p id="website-url-error" className="text-sm text-rose-200">
+												{errors.websiteUrl}
+											</p>
+										) : null}
 									</label>
 
 									<label className="space-y-2 sm:col-span-2">
@@ -214,6 +373,9 @@ export default function AnalyzePage() {
 													<path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
 												</svg>
 											</button>
+												{errors.industry ? (
+													<p className="text-sm text-rose-200">{errors.industry}</p>
+												) : null}
 
 											{isIndustryOpen ? (
 												<div
@@ -319,9 +481,10 @@ export default function AnalyzePage() {
 
 								<button
 									type="submit"
-									className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-cyan-100"
+									disabled={isSubmitting}
+									className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-cyan-100 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
 								>
-									Start Prism Analysis
+									{isSubmitting ? "Queueing analysis..." : "Start Prism Analysis"}
 								</button>
 							</form>
 						</div>
