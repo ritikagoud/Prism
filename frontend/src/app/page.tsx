@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const workflowSteps = [
 	{
 		title: "Ingest",
@@ -75,12 +77,12 @@ export default function Home() {
 							</p>
 						</div>
 					</div>
-					<a
-						href="#cta"
+					<Link
+						href="/analyze"
 						className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
 					>
 						Analyze a Startup
-					</a>
+					</Link>
 				</header>
 
 				<section className="grid gap-16 py-20 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-28">
@@ -101,12 +103,12 @@ export default function Home() {
 						</p>
 
 						<div className="mt-10 flex flex-col gap-4 sm:flex-row">
-							<a
-								href="#cta"
+							<Link
+								href="/analyze"
 								className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-cyan-100"
 							>
 								Analyze a Startup
-							</a>
+							</Link>
 							<a
 								href="#workflow"
 								className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-white/25 hover:bg-white/8"
@@ -320,12 +322,12 @@ export default function Home() {
 						</div>
 
 						<div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
-							<a
-								href="#"
+							<Link
+								href="/analyze"
 								className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-cyan-100"
 							>
 								Start Analysis
-							</a>
+							</Link>
 							<a
 								href="#workflow"
 								className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-white/25 hover:bg-white/8"

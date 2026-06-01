@@ -33,6 +33,10 @@ type IndustryOption = (typeof industryOptions)[number];
 type AnalysisResult = {
 	analysis_id: string;
 	status: string;
+	claims?: string[];
+	competitors?: string[];
+	risk_score?: number | null;
+	risk_level?: string | null;
 };
 
 type FormErrors = Partial<{
@@ -66,6 +70,20 @@ export default function AnalyzePage() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isIndustryOpen, setIsIndustryOpen] = useState(false);
 	const [activeIndustryIndex, setActiveIndustryIndex] = useState(0);
+
+	const claims = analysisResult?.claims ?? [];
+	const competitors = analysisResult?.competitors ?? [];
+	const riskScore = typeof analysisResult?.risk_score === "number" ? analysisResult.risk_score : null;
+	const riskLevel = analysisResult?.risk_level?.trim().toLowerCase() ?? "unknown";
+
+	const riskLevelBadgeClass =
+		riskLevel === "low"
+			? "border-emerald-300/30 bg-emerald-400/15 text-emerald-100"
+			: riskLevel === "medium"
+				? "border-amber-300/30 bg-amber-400/15 text-amber-100"
+				: riskLevel === "high"
+					? "border-rose-300/30 bg-rose-400/15 text-rose-100"
+					: "border-slate-300/20 bg-slate-400/10 text-slate-200";
 
 	const openIndustryMenu = () => {
 		setIsIndustryOpen(true);
@@ -245,7 +263,7 @@ export default function AnalyzePage() {
 							{analysisResult ? (
 								<div className="mt-6 rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-5 shadow-[0_0_40px_rgba(16,185,129,0.10)]">
 									<p className="text-xs uppercase tracking-[0.24em] text-emerald-200/80">
-										Analysis queued
+										Analysis completed
 									</p>
 									<div className="mt-3 grid gap-3 sm:grid-cols-2">
 										<div>
@@ -259,6 +277,64 @@ export default function AnalyzePage() {
 											<p className="mt-1 text-sm font-medium text-white">
 												{analysisResult.status}
 											</p>
+										</div>
+									</div>
+
+									<div className="mt-5 grid gap-4">
+										<div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
+											<p className="text-xs uppercase tracking-[0.2em] text-cyan-100/80">
+												Claims Found
+											</p>
+											<div className="mt-3 flex flex-wrap gap-2">
+												{claims.length > 0 ? (
+													claims.map((claim) => (
+														<span
+															key={claim}
+															className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-50"
+														>
+															{claim}
+														</span>
+													))
+												) : (
+													<p className="text-sm text-slate-300">No claims returned yet.</p>
+												)}
+											</div>
+										</div>
+
+										<div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
+											<p className="text-xs uppercase tracking-[0.2em] text-cyan-100/80">
+												Competitors Identified
+											</p>
+											<div className="mt-3 space-y-2">
+												{competitors.length > 0 ? (
+													competitors.map((competitor) => (
+														<p key={competitor} className="text-sm text-white">
+															- {competitor}
+														</p>
+													))
+												) : (
+													<p className="text-sm text-slate-300">No competitors returned yet.</p>
+												)}
+											</div>
+										</div>
+
+										<div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
+											<p className="text-xs uppercase tracking-[0.2em] text-cyan-100/80">
+												Risk Assessment
+											</p>
+											<div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+												<div>
+													<p className="text-xs text-slate-300">Risk score</p>
+													<p className="text-3xl font-semibold tracking-tight text-white">
+														{riskScore ?? "N/A"}
+													</p>
+												</div>
+												<span
+													className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] ${riskLevelBadgeClass}`}
+												>
+													{riskLevel}
+												</span>
+											</div>
 										</div>
 									</div>
 								</div>
