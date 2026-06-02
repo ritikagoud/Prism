@@ -17,3 +17,4 @@ class AnalysisResponse(BaseModel):
     competitors: list[str]
     risk_score: int
     risk_level: Literal["low", "medium", "high"]
+    identified_risks: list[str]

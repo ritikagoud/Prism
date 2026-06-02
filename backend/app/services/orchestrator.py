@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from uuid import uuid4
 
 from app.agents.claim_agent import ClaimAgent
-from app.agents.mock import CompetitorAgent, RiskAgent
+from app.agents.mock import CompetitorAgent
+from app.agents.risk_agent import RiskAgent
 from app.models.analysis import AnalysisRequest, AnalysisResponse
 
 
@@ -32,4 +33,5 @@ class OrchestratorService:
             competitors=competitors_result.competitors,
             risk_score=risk_result.risk_score,
             risk_level=risk_result.risk_level,
+            identified_risks=risk_result.identified_risks,
         )
