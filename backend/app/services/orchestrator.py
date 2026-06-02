@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from uuid import uuid4
 
-from app.agents.mock import ClaimAgent, CompetitorAgent, RiskAgent
+from app.agents.claim_agent import ClaimAgent
+from app.agents.mock import CompetitorAgent, RiskAgent
 from app.models.analysis import AnalysisRequest, AnalysisResponse
 
 
@@ -20,7 +21,7 @@ class OrchestratorService:
         )
 
     def run(self, request: AnalysisRequest) -> AnalysisResponse:
-        claims_result = self.claim_agent.run(request)
+        claims_result = self.claim_agent.run(request.startup_name, request.description)
         competitors_result = self.competitor_agent.run(request)
         risk_result = self.risk_agent.run(request)
 

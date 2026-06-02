@@ -5,11 +5,6 @@ from app.models.analysis import AnalysisRequest
 
 
 @dataclass(slots=True)
-class ClaimAgentResult:
-    claims: list[str]
-
-
-@dataclass(slots=True)
 class CompetitorAgentResult:
     competitors: list[str]
 
@@ -18,15 +13,6 @@ class CompetitorAgentResult:
 class RiskAgentResult:
     risk_score: int
     risk_level: Literal["low", "medium", "high"]
-
-
-class ClaimAgent:
-    name = "claim-agent"
-
-    def run(self, request: AnalysisRequest) -> ClaimAgentResult:
-        return ClaimAgentResult(
-            claims=["Rapid user growth", "Strong market opportunity"],
-        )
 
 
 class CompetitorAgent:
