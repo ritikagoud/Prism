@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from uuid import uuid4
 
 from app.agents.claim_agent import ClaimAgent
-from app.agents.mock import CompetitorAgent
+from app.agents.competitor_agent import CompetitorAgent
 from app.agents.risk_agent import RiskAgent
 from app.models.analysis import AnalysisRequest, AnalysisResponse
 
