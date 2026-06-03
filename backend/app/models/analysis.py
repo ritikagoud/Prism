@@ -8,6 +8,7 @@ class AnalysisRequest(BaseModel):
     description: str = Field(min_length=1, max_length=5000)
     website_url: AnyUrl
     industry: str = Field(min_length=1, max_length=100)
+    uploaded_file_id: str | None = None
 
 
 class AnalysisResponse(BaseModel):

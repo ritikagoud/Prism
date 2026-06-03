@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
 const ANALYSIS_ENDPOINT = "http://127.0.0.1:8000/api/v1/analysis";
+const UPLOAD_ENDPOINT = "http://127.0.0.1:8000/api/v1/upload";
 
 const highlights = [
 	"\u2713 Claim Extraction",
@@ -39,6 +40,13 @@ type AnalysisResult = {
 	risk_level?: string | null;
 };
 
+type UploadResult = {
+	file_id: string;
+	filename: string;
+	size: number;
+	status: string;
+};
+
 type FormErrors = Partial<{
 	startupName: string;
 	description: string;
@@ -60,6 +68,7 @@ export default function AnalyzePage() {
 	const listboxId = useId();
 	const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
 	const dropdownRef = useRef<HTMLDivElement | null>(null);
+	const pdfInputRef = useRef<HTMLInputElement | null>(null);
 	const [startupName, setStartupName] = useState("");
 	const [description, setDescription] = useState("");
 	const [websiteUrl, setWebsiteUrl] = useState("");
@@ -68,6 +77,10 @@ export default function AnalyzePage() {
 	const [submitError, setSubmitError] = useState("");
 	const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [selectedPdfName, setSelectedPdfName] = useState("");
+	const [uploadedFileId, setUploadedFileId] = useState("");
+	const [uploadState, setUploadState] = useState<"idle" | "uploading" | "uploaded" | "error">("idle");
+	const [uploadMessage, setUploadMessage] = useState("");
 	const [isIndustryOpen, setIsIndustryOpen] = useState(false);
 	const [activeIndustryIndex, setActiveIndustryIndex] = useState(0);
 
@@ -102,6 +115,63 @@ export default function AnalyzePage() {
 		closeIndustryMenu();
 	};
 
+	const uploadSelectedPdf = async (file: File) => {
+		setSubmitError("");
+		setAnalysisResult(null);
+		setUploadState("uploading");
+		setUploadMessage("Uploading PDF...");
+		setUploadedFileId("");
+
+		try {
+			const formData = new FormData();
+			formData.append("file", file);
+
+			const response = await fetch(UPLOAD_ENDPOINT, {
+				method: "POST",
+				body: formData,
+			});
+
+			if (!response.ok) {
+				const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
+				throw new Error(payload?.detail || "Upload failed.");
+			}
+
+			const data = (await response.json()) as UploadResult;
+			setUploadedFileId(data.file_id);
+			setUploadState("uploaded");
+			setUploadMessage(`${data.filename} uploaded successfully.`);
+		} catch (error) {
+			setUploadState("error");
+			setUploadMessage(error instanceof Error ? error.message : "Unable to upload PDF.");
+		}
+	};
+
+	const handlePdfChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (!file) {
+			return;
+		}
+
+		event.target.value = "";
+
+		setSelectedPdfName(file.name);
+		setUploadMessage("");
+		setUploadState("idle");
+		setUploadedFileId("");
+		setSubmitError("");
+
+		const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+		if (!isPdf) {
+			setUploadState("error");
+			setUploadMessage("Only PDF files are allowed.");
+			event.target.value = "";
+			setSelectedPdfName("");
+			return;
+		}
+
+		await uploadSelectedPdf(file);
+	};
+
 	const validate = () => {
 		const nextErrors: FormErrors = {};
 
@@ -133,6 +203,16 @@ export default function AnalyzePage() {
 			return;
 		}
 
+		if (selectedPdfName && uploadState === "uploading") {
+			setSubmitError("Please wait for the PDF upload to finish.");
+			return;
+		}
+
+		if (selectedPdfName && !uploadedFileId) {
+			setSubmitError("Please upload a valid PDF before starting analysis.");
+			return;
+		}
+
 		setIsSubmitting(true);
 
 		try {
@@ -146,6 +226,7 @@ export default function AnalyzePage() {
 					description: description.trim(),
 					website_url: websiteUrl.trim(),
 					industry,
+					uploaded_file_id: uploadedFileId || undefined,
 				}),
 			});
 
@@ -524,7 +605,11 @@ export default function AnalyzePage() {
 											PDF upload
 										</span>
 										<div className="rounded-3xl border border-dashed border-white/15 bg-white/[0.04] p-4 transition hover:border-cyan-400/35 hover:bg-white/[0.06]">
-											<label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-white/8 bg-slate-950/50 px-6 py-8 text-center">
+											<label
+												className={`flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/8 bg-slate-950/50 px-6 py-8 text-center ${
+													isSubmitting || uploadState === "uploading" ? "cursor-not-allowed" : "cursor-pointer"
+												}`}
+											>
 												<div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-400/20 bg-cyan-400/10 text-cyan-100">
 													<svg
 														aria-hidden="true"
@@ -549,18 +634,76 @@ export default function AnalyzePage() {
 														or click to browse files
 													</p>
 												</div>
-												<input type="file" accept=".pdf,application/pdf" className="sr-only" />
+												<input
+													ref={pdfInputRef}
+													type="file"
+													accept=".pdf,application/pdf"
+													disabled={isSubmitting || uploadState === "uploading"}
+													className="sr-only"
+													onChange={handlePdfChange}
+												/>
 											</label>
+											<div className="mt-4 flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/45 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+												<div>
+													<p className="text-sm font-medium text-white">
+														{selectedPdfName || "No PDF selected"}
+													</p>
+													<p className="mt-1 text-sm text-slate-400">
+														Only PDF files up to 10 MB are accepted.
+													</p>
+												</div>
+												<div
+													className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] ${
+														uploadState === "uploaded"
+															? "border-emerald-300/30 bg-emerald-400/15 text-emerald-100"
+															: uploadState === "uploading"
+																? "border-cyan-300/30 bg-cyan-400/15 text-cyan-100"
+																: uploadState === "error"
+																	? "border-rose-300/30 bg-rose-400/15 text-rose-100"
+																	: "border-white/15 bg-white/5 text-slate-200"
+													}`}
+												>
+													{uploadState === "uploaded"
+														? "Uploaded"
+														: uploadState === "uploading"
+															? "Uploading"
+															: uploadState === "error"
+																? "Upload error"
+																: "Awaiting file"}
+												</div>
+											</div>
+											{uploadMessage ? (
+												<p
+													className={`mt-3 text-sm ${
+														uploadState === "uploaded"
+															? "text-emerald-200"
+															: uploadState === "error"
+																? "text-rose-200"
+																: "text-slate-300"
+													}`}
+												>
+													{uploadMessage}
+												</p>
+											) : null}
+											{uploadState === "uploading" ? (
+												<p className="mt-2 text-sm text-cyan-200">
+													PDF upload is in progress. You can submit once it completes.
+												</p>
+											) : null}
 										</div>
 									</label>
 								</div>
 
 								<button
 									type="submit"
-									disabled={isSubmitting}
+									disabled={isSubmitting || uploadState === "uploading"}
 									className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-cyan-100 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
 								>
-									{isSubmitting ? "Queueing analysis..." : "Start Prism Analysis"}
+									{isSubmitting
+										? "Queueing analysis..."
+										: uploadState === "uploading"
+											? "Uploading PDF..."
+											: "Start Prism Analysis"}
 								</button>
 							</form>
 						</div>
