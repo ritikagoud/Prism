@@ -77,12 +77,20 @@ export default function Home() {
 							</p>
 						</div>
 					</div>
-					<Link
-						href="/analyze"
-						className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
-					>
-						Analyze a Startup
-					</Link>
+					<div className="flex flex-wrap items-center gap-3">
+						<Link
+							href="/dashboard"
+							className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
+						>
+							Dashboard
+						</Link>
+						<Link
+							href="/analyze"
+							className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
+						>
+							Analyze a Startup
+						</Link>
+					</div>
 				</header>
 
 				<section className="grid gap-16 py-20 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-28">
