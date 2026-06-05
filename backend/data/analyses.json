@@ -13,5 +13,20 @@
       "AI platform helping investors evaluate startups"
     ],
     "timestamp": "2026-06-05T07:46:52.548746+00:00"
+  },
+  {
+    "analysis_id": "bf72f4fd-d291-4c5a-870d-5a9dd6542cf7",
+    "startup_name": "Prism Analytics",
+    "risk_score": 52,
+    "risk_level": "medium",
+    "competitors": [
+      "OpenAI",
+      "Anthropic",
+      "Perplexity"
+    ],
+    "claims": [
+      "Analysis of data"
+    ],
+    "timestamp": "2026-06-05T08:02:05.391959+00:00"
   }
 ]

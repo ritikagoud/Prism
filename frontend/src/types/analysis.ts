@@ -10,3 +10,15 @@ export type AnalysisSummary = {
 	status: AnalysisStatus;
 	analyzedAt: string;
 };
+
+export type ApiRiskLevel = "low" | "medium" | "high";
+
+export type AnalysisHistoryRecord = {
+	analysis_id: string;
+	startup_name: string;
+	risk_score: number;
+	risk_level: ApiRiskLevel;
+	competitors: string[];
+	claims: string[];
+	timestamp: string;
+};
