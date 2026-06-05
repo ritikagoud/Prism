@@ -1,0 +1,17 @@
+[
+  {
+    "analysis_id": "ca24854a-dca6-4106-b83a-f9317b142810",
+    "startup_name": "Prism Analytics",
+    "risk_score": 52,
+    "risk_level": "medium",
+    "competitors": [
+      "OpenAI",
+      "Anthropic",
+      "Perplexity"
+    ],
+    "claims": [
+      "AI platform helping investors evaluate startups"
+    ],
+    "timestamp": "2026-06-05T07:46:52.548746+00:00"
+  }
+]

@@ -1,10 +1,12 @@
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from app.agents.claim_agent import ClaimAgent
 from app.agents.competitor_agent import CompetitorAgent
 from app.agents.risk_agent import RiskAgent
-from app.models.analysis import AnalysisRequest, AnalysisResponse
+from app.models.analysis import AnalysisRecord, AnalysisRequest, AnalysisResponse
+from app.services.analysis_persistence import AnalysisPersistenceService
 
 
 @dataclass(slots=True)
@@ -12,6 +14,7 @@ class OrchestratorService:
     claim_agent: ClaimAgent
     competitor_agent: CompetitorAgent
     risk_agent: RiskAgent
+    analysis_persistence: AnalysisPersistenceService
 
     @classmethod
     def create_default(cls) -> "OrchestratorService":
@@ -19,6 +22,7 @@ class OrchestratorService:
             claim_agent=ClaimAgent(),
             competitor_agent=CompetitorAgent(),
             risk_agent=RiskAgent(),
+            analysis_persistence=AnalysisPersistenceService.create_default(),
         )
 
     def run(self, request: AnalysisRequest) -> AnalysisResponse:
@@ -26,7 +30,7 @@ class OrchestratorService:
         competitors_result = self.competitor_agent.run(request)
         risk_result = self.risk_agent.run(request)
 
-        return AnalysisResponse(
+        response = AnalysisResponse(
             analysis_id=str(uuid4()),
             status="completed",
             claims=claims_result.claims,
@@ -35,3 +39,17 @@ class OrchestratorService:
             risk_level=risk_result.risk_level,
             identified_risks=risk_result.identified_risks,
         )
+
+        self.analysis_persistence.save_analysis(
+            AnalysisRecord(
+                analysis_id=response.analysis_id,
+                startup_name=request.startup_name,
+                risk_score=response.risk_score,
+                risk_level=response.risk_level,
+                competitors=response.competitors,
+                claims=response.claims,
+                timestamp=datetime.now(timezone.utc).isoformat(),
+            )
+        )
+
+        return response

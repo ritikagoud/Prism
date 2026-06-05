@@ -19,3 +19,13 @@ class AnalysisResponse(BaseModel):
     risk_score: int
     risk_level: Literal["low", "medium", "high"]
     identified_risks: list[str]
+
+
+class AnalysisRecord(BaseModel):
+    analysis_id: str
+    startup_name: str
+    risk_score: int
+    risk_level: Literal["low", "medium", "high"]
+    competitors: list[str]
+    claims: list[str]
+    timestamp: str
