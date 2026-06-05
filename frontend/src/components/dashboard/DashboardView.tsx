@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { AnalysisCard } from "@/components/dashboard/AnalysisCard";
@@ -181,7 +182,14 @@ export function DashboardView() {
 				) : (
 					<div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 						{analyses.map((analysis) => (
-							<AnalysisCard key={analysis.id} analysis={analysis} />
+							<Link
+								key={analysis.id}
+								href={`/report/${analysis.id}`}
+								aria-label={`Open report for ${analysis.startupName}`}
+								className="block"
+							>
+								<AnalysisCard analysis={analysis} />
+							</Link>
 						))}
 					</div>
 				)}
