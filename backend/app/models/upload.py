@@ -6,3 +6,4 @@ class UploadResponse(BaseModel):
     filename: str
     size: int
     status: str
+    extracted_text_preview: str

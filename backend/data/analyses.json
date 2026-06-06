@@ -28,5 +28,18 @@
       "Analysis of data"
     ],
     "timestamp": "2026-06-05T08:02:05.391959+00:00"
+  },
+  {
+    "analysis_id": "d3b42a40-744c-4c47-b297-3026354dbfb6",
+    "startup_name": "sfdsaf",
+    "risk_score": 82,
+    "risk_level": "high",
+    "competitors": [
+      "Stripe",
+      "Razorpay",
+      "PayPal"
+    ],
+    "claims": [],
+    "timestamp": "2026-06-06T13:42:44.949391+00:00"
   }
 ]

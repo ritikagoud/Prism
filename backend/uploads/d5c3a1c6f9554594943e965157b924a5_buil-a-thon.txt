@@ -1,0 +1,94 @@
+DRISHTI 
+AI-Powered Crisis Intelligence & Response Platform 
+Team Information 
+Team Name: AIR 
+Team Member: 
+• Ritika Goud 
+ 
+Executive Summary 
+Drishti is an AI-powered crisis intelligence platform that helps emergency responders and 
+decision-makers identify, analyze, and manage crisis situations efficiently. The platform 
+transforms scattered information into actionable intelligence through AI-driven analysis, 
+severity assessment, visualization, and automated reporting. 
+By providing a centralized decision-support system, Drishti enables faster response times, 
+improved situational awareness, and more effective resource allocation during emergencies. 
+ 
+Problem Statement 
+During disasters and emergency situations, critical information is often fragmented across 
+multiple sources such as social media platforms, news channels, public reports, and 
+emergency communications. 
+This information overload creates significant challenges for authorities, including delayed 
+incident detection, inaccurate prioritization, and inefficient coordination of response efforts. 
+A unified system capable of collecting, analyzing, and presenting crisis intelligence in real 
+time is essential for effective emergency management. 
+ 
+Proposed Solution 
+Drishti addresses these challenges through an AI-powered crisis intelligence framework. 
+The platform collects incoming crisis-related information, processes it using advanced AI 
+techniques, evaluates severity levels, and presents actionable insights through an intuitive 
+dashboard. Automated report generation further assists stakeholders in making informed 
+decisions during critical situations. 
+ 
+Key Features 
+Real-Time Crisis Monitoring 
+Monitors and processes incoming crisis-related information to maintain up-to-date situational 
+awareness. 
+AI-Powered Incident Analysis 
+Utilizes Large Language Models and Natural Language Processing techniques to analyze 
+reports and extract meaningful intelligence. 
+Severity Classification 
+Automatically categorizes incidents based on urgency, impact, and response priority. 
+Interactive Analytics Dashboard 
+Provides a centralized view of crisis information, trends, and incident summaries. 
+Automated Report Generation 
+Generates concise reports that support rapid decision-making and response planning. 
+Data Visualization 
+Converts complex crisis data into understandable visual insights for better analysis. 
+ 
+Technology Stack 
+Frontend 
+• React / Next.js 
+• Tailwind CSS 
+Backend 
+• FastAPI 
+Artificial Intelligence 
+• Large Language Models (LLMs) 
+• Natural Language Processing (NLP) 
+Database 
+• PostgreSQL / MongoDB 
+Development Tools 
+• GitHub 
+• REST APIs 
+ 
+System Workflow 
+1. Crisis-related information is collected from available data sources. 
+2. Incoming data is cleaned, structured, and prepared for analysis. 
+3. AI models process the information and identify significant incidents. 
+4. The platform evaluates incident severity and priority levels. 
+5. Insights are displayed through the analytics dashboard. 
+6. Automated reports are generated to support decision-makers. 
+ 
+Expected Impact 
+Drishti contributes to: 
+• Faster emergency response and coordination. 
+• Improved situational awareness during crises. 
+• Reduction of information overload. 
+• Better prioritization of incidents. 
+• Enhanced allocation of emergency resources. 
+• More informed and data-driven decision-making. 
+ 
+Future Scope 
+• Predictive crisis forecasting using historical trends. 
+• Multilingual intelligence processing. 
+• Mobile application support. 
+• Advanced geospatial and location-based analysis. 
+• Integration with government and emergency response systems. 
+• Real-time public alert mechanisms. 
+ 
+Project Resources 
+GitHub Repository 
+https://github.com/ritikagoud/drishti 
+Demo Video 
+https://drive.google.com/file/d/1t2ffbqi7p9UBa5b0Rk9Ohz5fIU7uNyex/view?usp=sharing 
+ 
+Screenshots

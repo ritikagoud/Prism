@@ -19,4 +19,5 @@ async def upload_pdf(file: UploadFile = File(...)) -> UploadResponse:
         filename=result.filename,
         size=result.size,
         status="uploaded",
+        extracted_text_preview=result.extracted_text[:500],
     )

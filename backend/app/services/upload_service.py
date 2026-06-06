@@ -7,6 +7,8 @@ from uuid import uuid4
 
 from fastapi import UploadFile
 
+from app.services.pdf_extraction_service import PDFExtractionError, PDFExtractionService
+
 MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024
 PDF_SIGNATURE = b"%PDF-"
 
@@ -20,12 +22,14 @@ class UploadResult:
     file_id: str
     filename: str
     size: int
+    extracted_text: str
 
 
 class UploadService:
     def __init__(self, uploads_dir: Path | None = None) -> None:
         self.uploads_dir = uploads_dir or Path(__file__).resolve().parents[2] / "uploads"
         self.uploads_dir.mkdir(parents=True, exist_ok=True)
+        self.pdf_extractor = PDFExtractionService()
 
     async def store_pdf(self, file: UploadFile) -> UploadResult:
         self._validate_metadata(file)
@@ -52,9 +56,22 @@ class UploadService:
                         raise UploadValidationError("File size must not exceed 10 MB.")
 
                     output.write(chunk)
+
+            extracted_text = self.pdf_extractor.extract_text(destination)
+            self.pdf_extractor.store_text_sidecar(destination, extracted_text)
+        except PDFExtractionError:
+            if destination.exists():
+                destination.unlink()
+            text_path = destination.with_suffix(".txt")
+            if text_path.exists():
+                text_path.unlink()
+            raise
         except Exception:
             if destination.exists():
                 destination.unlink()
+            text_path = destination.with_suffix(".txt")
+            if text_path.exists():
+                text_path.unlink()
             raise
         finally:
             await file.close()
@@ -62,7 +79,7 @@ class UploadService:
         if not signature_checked:
             raise UploadValidationError("Uploaded file is empty.")
 
-        return UploadResult(file_id=file_id, filename=stored_filename, size=size)
+        return UploadResult(file_id=file_id, filename=stored_filename, size=size, extracted_text=extracted_text)
 
     def _validate_metadata(self, file: UploadFile) -> None:
         if not file.filename:
