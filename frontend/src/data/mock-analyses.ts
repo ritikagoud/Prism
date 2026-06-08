@@ -8,6 +8,7 @@ export const mockAnalyses: AnalysisSummary[] = [
 		riskLevel: "Medium",
 		status: "completed",
 		analyzedAt: "2026-05-28T14:32:00Z",
+		recommendation: "Proceed with Caution",
 	},
 	{
 		id: "anl_3b8n4q6r",
@@ -16,6 +17,7 @@ export const mockAnalyses: AnalysisSummary[] = [
 		riskLevel: "High",
 		status: "completed",
 		analyzedAt: "2026-05-21T09:15:00Z",
+		recommendation: "Reject",
 	},
 	{
 		id: "anl_9d1c5w2x",
@@ -24,5 +26,6 @@ export const mockAnalyses: AnalysisSummary[] = [
 		riskLevel: "High",
 		status: "completed",
 		analyzedAt: "2026-05-14T16:48:00Z",
+		recommendation: "Reject",
 	},
 ];

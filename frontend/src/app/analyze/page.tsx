@@ -38,6 +38,9 @@ type AnalysisResult = {
 	competitors?: string[];
 	risk_score?: number | null;
 	risk_level?: string | null;
+	recommendation?: string;
+	confidence?: number;
+	rationale?: string[];
 };
 
 type UploadResult = {
@@ -88,6 +91,9 @@ export default function AnalyzePage() {
 	const competitors = analysisResult?.competitors ?? [];
 	const riskScore = typeof analysisResult?.risk_score === "number" ? analysisResult.risk_score : null;
 	const riskLevel = analysisResult?.risk_level?.trim().toLowerCase() ?? "unknown";
+	const recommendation = analysisResult?.recommendation ?? null;
+	const confidence = typeof analysisResult?.confidence === "number" ? analysisResult.confidence : null;
+	const rationale = analysisResult?.rationale ?? [];
 
 	const riskLevelBadgeClass =
 		riskLevel === "low"
@@ -97,6 +103,23 @@ export default function AnalyzePage() {
 				: riskLevel === "high"
 					? "border-rose-300/30 bg-rose-400/15 text-rose-100"
 					: "border-slate-300/20 bg-slate-400/10 text-slate-200";
+
+	const getRecommendationBadgeClass = (rec: string | null) => {
+		if (!rec) return "border-slate-300/20 bg-slate-400/10 text-slate-200";
+		
+		switch (rec) {
+			case "Strong Buy":
+				return "border-emerald-300/30 bg-emerald-400/15 text-emerald-100";
+			case "Watchlist":
+				return "border-cyan-300/30 bg-cyan-400/15 text-cyan-100";
+			case "Proceed with Caution":
+				return "border-amber-300/30 bg-amber-400/15 text-amber-100";
+			case "Reject":
+				return "border-rose-300/30 bg-rose-400/15 text-rose-100";
+			default:
+				return "border-slate-300/20 bg-slate-400/10 text-slate-200";
+		}
+	};
 
 	const openIndustryMenu = () => {
 		setIsIndustryOpen(true);
@@ -416,6 +439,50 @@ export default function AnalyzePage() {
 													{riskLevel}
 												</span>
 											</div>
+										</div>
+
+										<div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
+											<p className="text-xs uppercase tracking-[0.2em] text-cyan-100/80">
+												Investment Decision
+											</p>
+											{recommendation ? (
+												<>
+													<div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+														<div>
+															<p className="text-xs text-slate-300">Recommendation</p>
+															<span
+																className={`mt-2 inline-flex rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] ${getRecommendationBadgeClass(recommendation)}`}
+															>
+																{recommendation}
+															</span>
+														</div>
+														<div>
+															<p className="text-xs text-slate-300">Confidence</p>
+															<p className="mt-1 text-2xl font-semibold tracking-tight text-white">
+																{confidence !== null ? `${(confidence * 100).toFixed(0)}%` : "N/A"}
+															</p>
+														</div>
+													</div>
+													{rationale.length > 0 ? (
+														<div className="mt-4 pt-4 border-t border-white/10">
+															<p className="text-xs text-slate-300 mb-2">Rationale</p>
+															<ul className="space-y-2">
+																{rationale.map((reason, index) => (
+																	<li
+																		key={index}
+																		className="flex items-start gap-2 text-xs leading-relaxed text-slate-200"
+																	>
+																		<span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-cyan-400" />
+																		<span>{reason}</span>
+																	</li>
+																))}
+															</ul>
+														</div>
+													) : null}
+												</>
+											) : (
+												<p className="mt-3 text-sm text-slate-300">Decision not available yet.</p>
+											)}
 										</div>
 									</div>
 								</div>

@@ -29,6 +29,7 @@ function toAnalysisSummary(analysis: AnalysisHistoryRecord): AnalysisSummary {
 		riskLevel: toDisplayRiskLevel(analysis.risk_level),
 		status: "completed",
 		analyzedAt: analysis.timestamp,
+		recommendation: analysis.recommendation,
 	};
 }
 

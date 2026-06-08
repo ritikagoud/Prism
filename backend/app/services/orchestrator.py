@@ -4,6 +4,7 @@ from uuid import uuid4
 
 from app.agents.claim_agent import ClaimAgent
 from app.agents.competitor_agent import CompetitorAgent
+from app.agents.investment_committee_agent import InvestmentCommitteeAgent
 from app.agents.risk_agent import RiskAgent
 from app.models.analysis import AnalysisRecord, AnalysisRequest, AnalysisResponse
 from app.services.analysis_persistence import AnalysisPersistenceService
@@ -14,6 +15,7 @@ class OrchestratorService:
     claim_agent: ClaimAgent
     competitor_agent: CompetitorAgent
     risk_agent: RiskAgent
+    investment_committee_agent: InvestmentCommitteeAgent
     analysis_persistence: AnalysisPersistenceService
 
     @classmethod
@@ -22,6 +24,7 @@ class OrchestratorService:
             claim_agent=ClaimAgent(),
             competitor_agent=CompetitorAgent(),
             risk_agent=RiskAgent(),
+            investment_committee_agent=InvestmentCommitteeAgent(),
             analysis_persistence=AnalysisPersistenceService.create_default(),
         )
 
@@ -29,6 +32,13 @@ class OrchestratorService:
         claims_result = self.claim_agent.run(request.startup_name, request.description)
         competitors_result = self.competitor_agent.run(request)
         risk_result = self.risk_agent.run(request)
+        
+        investment_result = self.investment_committee_agent.run(
+            claims=claims_result.claims,
+            competitors=competitors_result.competitors,
+            risk_score=risk_result.risk_score,
+            risk_level=risk_result.risk_level,
+        )
 
         response = AnalysisResponse(
             analysis_id=str(uuid4()),
@@ -38,6 +48,9 @@ class OrchestratorService:
             risk_score=risk_result.risk_score,
             risk_level=risk_result.risk_level,
             identified_risks=risk_result.identified_risks,
+            recommendation=investment_result.recommendation,
+            confidence=investment_result.confidence,
+            rationale=investment_result.rationale,
         )
 
         self.analysis_persistence.save_analysis(
@@ -48,6 +61,9 @@ class OrchestratorService:
                 risk_level=response.risk_level,
                 competitors=response.competitors,
                 claims=response.claims,
+                recommendation=response.recommendation,
+                confidence=response.confidence,
+                rationale=response.rationale,
                 timestamp=datetime.now(timezone.utc).isoformat(),
             )
         )

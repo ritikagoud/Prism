@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PrismHeader } from "@/components/layout/PrismHeader";
 import { PrismPageShell } from "@/components/layout/PrismPageShell";
 import { NavLink } from "@/components/ui/NavLink";
+import RecommendationBadge from "@/components/ui/RecommendationBadge";
 import { RiskLevelBadge } from "@/components/ui/RiskLevelBadge";
 import { formatAnalysisTimestamp } from "@/lib/format";
 import { getRiskScoreAccentClass } from "@/lib/risk";
@@ -213,6 +214,44 @@ export function AnalysisReportView({ analysisId }: AnalysisReportViewProps) {
 						</article>
 
 						<aside className="flex flex-col gap-4">
+							<section className="rounded-[1.75rem] border border-white/10 bg-white/[0.05] p-6 backdrop-blur-xl">
+								<h3 className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-200/70">
+									Investment Decision
+								</h3>
+								<div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/50 p-5">
+									<div className="flex items-center justify-between">
+										<span className="text-sm uppercase tracking-[0.2em] text-slate-400">
+											Recommendation
+										</span>
+										<RecommendationBadge recommendation={analysis.recommendation} />
+									</div>
+									<div className="mt-4 flex items-center justify-between">
+										<span className="text-sm uppercase tracking-[0.2em] text-slate-400">
+											Confidence
+										</span>
+										<span className="text-xl font-semibold text-white">
+											{(analysis.confidence * 100).toFixed(0)}%
+										</span>
+									</div>
+								</div>
+								<div className="mt-4">
+									<h4 className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+										Rationale
+									</h4>
+									<ul className="mt-3 space-y-2">
+										{analysis.rationale.map((reason, index) => (
+											<li
+												key={index}
+												className="flex items-start gap-2 text-sm leading-6 text-slate-300"
+											>
+												<span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-cyan-400" />
+												<span>{reason}</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							</section>
+
 							<section className="rounded-[1.75rem] border border-white/10 bg-white/[0.05] p-6 backdrop-blur-xl">
 								<h3 className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-200/70">
 									Executive Summary

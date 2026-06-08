@@ -19,6 +19,9 @@ class AnalysisResponse(BaseModel):
     risk_score: int
     risk_level: Literal["low", "medium", "high"]
     identified_risks: list[str]
+    recommendation: Literal["Strong Buy", "Watchlist", "Proceed with Caution", "Reject"]
+    confidence: float
+    rationale: list[str]
 
 
 class AnalysisRecord(BaseModel):
@@ -28,4 +31,9 @@ class AnalysisRecord(BaseModel):
     risk_level: Literal["low", "medium", "high"]
     competitors: list[str]
     claims: list[str]
+    recommendation: Literal["Strong Buy", "Watchlist", "Proceed with Caution", "Reject"] = "Watchlist"
+    confidence: float = 0.70
+    rationale: list[str] = Field(
+        default_factory=lambda: ["Historical record loaded before Investment Committee Agent implementation"]
+    )
     timestamp: str

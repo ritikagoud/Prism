@@ -1,3 +1,4 @@
+import RecommendationBadge from "@/components/ui/RecommendationBadge";
 import { RiskLevelBadge } from "@/components/ui/RiskLevelBadge";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatAnalysisDate } from "@/lib/format";
@@ -43,6 +44,15 @@ export function AnalysisCard({ analysis }: AnalysisCardProps) {
 					<div className="mt-3">
 						<RiskLevelBadge level={analysis.riskLevel} />
 					</div>
+				</div>
+			</div>
+
+			<div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+				<p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+					Investment Decision
+				</p>
+				<div className="mt-3">
+					<RecommendationBadge recommendation={analysis.recommendation} />
 				</div>
 			</div>
 
