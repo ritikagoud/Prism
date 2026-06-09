@@ -383,7 +383,7 @@ The result is faster due diligence, more consistent evaluations, and improved de
 
 ## Team
 
-**Ritika Goud**
+Ritika Goud
 
 ---
 
