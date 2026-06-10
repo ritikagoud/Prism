@@ -22,6 +22,7 @@ class AnalysisResponse(BaseModel):
     recommendation: Literal["Strong Buy", "Watchlist", "Proceed with Caution", "Reject"]
     confidence: float
     rationale: list[str]
+    investment_memo: str
 
 
 class AnalysisRecord(BaseModel):
@@ -35,5 +36,8 @@ class AnalysisRecord(BaseModel):
     confidence: float = 0.70
     rationale: list[str] = Field(
         default_factory=lambda: ["Historical record loaded before Investment Committee Agent implementation"]
+    )
+    investment_memo: str = Field(
+        default="Investment memo not available for historical records."
     )
     timestamp: str

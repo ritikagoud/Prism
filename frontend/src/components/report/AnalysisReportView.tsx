@@ -126,8 +126,9 @@ export function AnalysisReportView({ analysisId }: AnalysisReportViewProps) {
 						<p className="mt-2 text-sm leading-6 text-slate-400">{errorMessage}</p>
 					</div>
 				) : analysis ? (
-					<div className="mt-8 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-						<article className="rounded-[1.75rem] border border-white/10 bg-white/[0.05] p-6 backdrop-blur-xl">
+					<>
+						<div className="mt-8 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+							<article className="rounded-[1.75rem] border border-white/10 bg-white/[0.05] p-6 backdrop-blur-xl">
 							<div className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-start sm:justify-between">
 								<div>
 									<p className="text-xs uppercase tracking-[0.24em] text-slate-400">
@@ -274,6 +275,48 @@ export function AnalysisReportView({ analysisId }: AnalysisReportViewProps) {
 							</section>
 						</aside>
 					</div>
+
+					{analysis.investment_memo && analysis.investment_memo !== "Investment memo not available for historical records." && (
+						<div className="mt-8">
+							<section className="rounded-[1.75rem] border border-white/10 bg-white/[0.05] p-8 backdrop-blur-xl">
+								<div className="mb-6 flex items-start justify-between gap-4">
+									<div>
+										<h2 className="text-xl font-semibold uppercase tracking-[0.24em] text-cyan-200/70">
+											Investment Memo
+										</h2>
+										<p className="mt-2 text-sm text-slate-400">
+											Professional VC-style investment analysis
+										</p>
+									</div>
+									<button
+										onClick={() => {
+											const blob = new Blob([analysis.investment_memo], { type: 'text/plain' });
+											const url = URL.createObjectURL(blob);
+											const a = document.createElement('a');
+											a.href = url;
+											a.download = `${analysis.startup_name.replace(/\s+/g, '_')}_Investment_Memo.txt`;
+											document.body.appendChild(a);
+											a.click();
+											document.body.removeChild(a);
+											URL.revokeObjectURL(url);
+										}}
+										className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:border-cyan-400/40 hover:bg-cyan-400/20"
+									>
+										<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+										</svg>
+										Download Memo
+									</button>
+								</div>
+								<div className="rounded-2xl border border-white/10 bg-slate-950/50 p-6">
+									<pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-slate-200">
+										{analysis.investment_memo}
+									</pre>
+								</div>
+							</section>
+						</div>
+					)}
+					</>
 				) : null}
 			</section>
 		</PrismPageShell>

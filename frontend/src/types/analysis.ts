@@ -26,5 +26,6 @@ export type AnalysisHistoryRecord = {
 	recommendation: RecommendationType;
 	confidence: number;
 	rationale: string[];
+	investment_memo: string;
 	timestamp: string;
 };

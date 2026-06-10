@@ -8,6 +8,7 @@ from app.agents.investment_committee_agent import InvestmentCommitteeAgent
 from app.agents.risk_agent import RiskAgent
 from app.models.analysis import AnalysisRecord, AnalysisRequest, AnalysisResponse
 from app.services.analysis_persistence import AnalysisPersistenceService
+from app.services.investment_memo_service import InvestmentMemoService
 
 
 @dataclass(slots=True)
@@ -16,6 +17,7 @@ class OrchestratorService:
     competitor_agent: CompetitorAgent
     risk_agent: RiskAgent
     investment_committee_agent: InvestmentCommitteeAgent
+    investment_memo_service: InvestmentMemoService
     analysis_persistence: AnalysisPersistenceService
 
     @classmethod
@@ -25,6 +27,7 @@ class OrchestratorService:
             competitor_agent=CompetitorAgent(),
             risk_agent=RiskAgent(),
             investment_committee_agent=InvestmentCommitteeAgent(),
+            investment_memo_service=InvestmentMemoService(),
             analysis_persistence=AnalysisPersistenceService.create_default(),
         )
 
@@ -40,6 +43,17 @@ class OrchestratorService:
             risk_level=risk_result.risk_level,
         )
 
+        memo_result = self.investment_memo_service.generate_memo(
+            startup_name=request.startup_name,
+            claims=claims_result.claims,
+            competitors=competitors_result.competitors,
+            risk_score=risk_result.risk_score,
+            risk_level=risk_result.risk_level,
+            recommendation=investment_result.recommendation,
+            confidence=investment_result.confidence,
+            rationale=investment_result.rationale,
+        )
+
         response = AnalysisResponse(
             analysis_id=str(uuid4()),
             status="completed",
@@ -51,6 +65,7 @@ class OrchestratorService:
             recommendation=investment_result.recommendation,
             confidence=investment_result.confidence,
             rationale=investment_result.rationale,
+            investment_memo=memo_result.memo,
         )
 
         self.analysis_persistence.save_analysis(
@@ -64,6 +79,7 @@ class OrchestratorService:
                 recommendation=response.recommendation,
                 confidence=response.confidence,
                 rationale=response.rationale,
+                investment_memo=response.investment_memo,
                 timestamp=datetime.now(timezone.utc).isoformat(),
             )
         )
