@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PrismHeader } from "@/components/layout/PrismHeader";
 import { PrismPageShell } from "@/components/layout/PrismPageShell";
 import { NavLink } from "@/components/ui/NavLink";
+import EvidenceStatusBadge from "@/components/ui/EvidenceStatusBadge";
 import RecommendationBadge from "@/components/ui/RecommendationBadge";
 import { RiskLevelBadge } from "@/components/ui/RiskLevelBadge";
 import { formatAnalysisTimestamp } from "@/lib/format";
@@ -212,6 +213,79 @@ export function AnalysisReportView({ analysisId }: AnalysisReportViewProps) {
 									</ul>
 								</div>
 							</div>
+
+							{analysis.evidence_verification && analysis.evidence_verification.length > 0 && (
+								<div className="mt-6">
+									<h3 className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-200/70">
+										Evidence Verification
+									</h3>
+									<div className="mt-4 space-y-4">
+										{analysis.evidence_verification.map((evidence, index) => (
+											<div
+												key={index}
+												className="rounded-2xl border border-white/10 bg-slate-950/50 p-4"
+											>
+												<div className="flex items-start justify-between gap-3">
+													<p className="text-sm font-medium text-slate-200 flex-1">
+														{evidence.claim}
+													</p>
+													<EvidenceStatusBadge status={evidence.status} />
+												</div>
+												
+												<div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
+													<span>Confidence:</span>
+													<span className="font-medium text-slate-300">
+														{(evidence.confidence * 100).toFixed(0)}%
+													</span>
+												</div>
+												
+												{evidence.evidence_sources && evidence.evidence_sources.length > 0 && (
+													<div className="mt-3">
+														<p className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-2">
+															Evidence Sources
+														</p>
+														<div className="space-y-2">
+															{evidence.evidence_sources.map((source, idx) => (
+																<div
+																	key={idx}
+																	className="rounded-lg border border-white/5 bg-slate-900/50 p-2"
+																>
+																	<div className="flex items-start gap-2">
+																		<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-400/10 text-cyan-200 border border-cyan-400/20 whitespace-nowrap">
+																			{source.source_type}
+																		</span>
+																		<div className="flex-1">
+																			<p className="text-xs text-slate-300">
+																				{source.evidence}
+																			</p>
+																			{source.source_reference && (
+																				<p className="mt-1 text-[10px] text-slate-500">
+																					{source.source_reference}
+																				</p>
+																			)}
+																		</div>
+																	</div>
+																</div>
+															))}
+														</div>
+													</div>
+												)}
+												
+												{evidence.verification_reasoning && (
+													<div className="mt-3 pt-3 border-t border-white/5">
+														<p className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-1">
+															Verification Reasoning
+														</p>
+														<p className="text-xs leading-relaxed text-slate-400">
+															{evidence.verification_reasoning}
+														</p>
+													</div>
+												)}
+											</div>
+										))}
+									</div>
+								</div>
+							)}
 						</article>
 
 						<aside className="flex flex-col gap-4">

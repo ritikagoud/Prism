@@ -8,6 +8,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.analysis import ClaimEvidenceItem
 
 
 @dataclass(slots=True)
@@ -31,6 +35,7 @@ class InvestmentMemoService:
         recommendation: str,
         confidence: float,
         rationale: list[str],
+        evidence_verification: list["ClaimEvidenceItem"] | None = None,
     ) -> InvestmentMemoResult:
         """
         Generate a professional investment memo from analysis results.
@@ -44,6 +49,7 @@ class InvestmentMemoService:
             recommendation: Investment recommendation
             confidence: Confidence score (0.0-1.0)
             rationale: List of rationale statements
+            evidence_verification: Optional evidence verification results
         
         Returns:
             InvestmentMemoResult with the formatted memo
@@ -54,11 +60,18 @@ class InvestmentMemoService:
                 startup_name, recommendation, confidence, risk_score, risk_level
             ),
             self._generate_business_overview(startup_name, claims),
+        ]
+        
+        # Add evidence verification section if available
+        if evidence_verification:
+            sections.append(self._generate_evidence_verification(evidence_verification))
+        
+        sections.extend([
             self._generate_competitive_landscape(startup_name, competitors),
             self._generate_risk_assessment(risk_score, risk_level),
             self._generate_investment_recommendation(recommendation, confidence, rationale),
             self._generate_footer(),
-        ]
+        ])
         
         memo = "\n\n".join(sections)
         
@@ -132,6 +145,79 @@ Recommendation: Request additional documentation from the founding team, includi
 {claims_text}
 
 The company's positioning suggests a focused approach to addressing market needs. The clarity and number of validated claims indicate {"a mature go-to-market strategy" if claim_count >= 5 else "an evolving market strategy that requires further validation" if claim_count >= 3 else "an early-stage value proposition requiring significant development"}."""
+    
+    def _generate_evidence_verification(self, evidence_verification: list) -> str:
+        """Generate evidence verification section."""
+        if not evidence_verification:
+            return """EVIDENCE VERIFICATION
+
+No evidence verification data available for this analysis."""
+        
+        verified_count = sum(1 for ev in evidence_verification if ev.status == "Verified")
+        partial_count = sum(1 for ev in evidence_verification if ev.status == "Partially Verified")
+        unverified_count = sum(1 for ev in evidence_verification if ev.status == "Unverified")
+        total_count = len(evidence_verification)
+        
+        avg_confidence = sum(ev.confidence for ev in evidence_verification) / total_count if total_count > 0 else 0.0
+        
+        # Generate status summary
+        if verified_count / total_count >= 0.7:
+            overall_assessment = "strong evidence base with direct source attribution"
+        elif verified_count / total_count >= 0.4:
+            overall_assessment = "moderate evidence base requiring additional verification"
+        else:
+            overall_assessment = "limited evidence base indicating need for deeper due diligence"
+        
+        claims_detail = []
+        for ev in evidence_verification:
+            status_indicator = "✓" if ev.status == "Verified" else "◐" if ev.status == "Partially Verified" else "○"
+            confidence_pct = int(ev.confidence * 100)
+            
+            # Format evidence sources
+            if hasattr(ev, 'evidence_sources') and ev.evidence_sources:
+                source_details = []
+                for src in ev.evidence_sources[:3]:  # Limit to 3 sources
+                    source_type = src.get('source_type', 'Unknown') if isinstance(src, dict) else getattr(src, 'source_type', 'Unknown')
+                    evidence_text = src.get('evidence', '') if isinstance(src, dict) else getattr(src, 'evidence', '')
+                    
+                    # Truncate long evidence
+                    if len(evidence_text) > 80:
+                        evidence_text = evidence_text[:77] + "..."
+                    
+                    source_details.append(f"[{source_type}] {evidence_text}")
+                
+                sources_text = "\n   ".join(source_details)
+            else:
+                sources_text = "No source attribution available"
+            
+            # Get reasoning
+            reasoning = getattr(ev, 'verification_reasoning', 'No reasoning provided')
+            if len(reasoning) > 150:
+                reasoning = reasoning[:147] + "..."
+            
+            claims_detail.append(
+                f"{status_indicator} {ev.claim}\n"
+                f"   Status: {ev.status} (Confidence: {confidence_pct}%)\n"
+                f"   Sources:\n   {sources_text}\n"
+                f"   Reasoning: {reasoning}"
+            )
+        
+        claims_text = "\n\n".join(claims_detail)
+        
+        return f"""EVIDENCE VERIFICATION
+
+Our source-based evidence verification analyzed {total_count} claims with an average confidence of {int(avg_confidence * 100)}%. The analysis indicates a {overall_assessment}.
+
+Verification Summary:
+• Verified Claims: {verified_count} (evidence found in multiple sources)
+• Partially Verified: {partial_count} (limited source evidence)
+• Unverified: {unverified_count} (no supporting evidence in materials)
+
+Detailed Findings:
+
+{claims_text}
+
+Methodology: Evidence verification traces each claim back to specific sources (pitch deck excerpts, startup descriptions, document content) rather than relying on keyword patterns. Claims are considered verified only when direct supporting statements are found in provided materials."""
     
     def _generate_competitive_landscape(self, startup_name: str, competitors: list[str]) -> str:
         """Generate competitive landscape section."""

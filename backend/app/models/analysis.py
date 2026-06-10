@@ -3,6 +3,22 @@ from typing import Literal
 from pydantic import AnyUrl, BaseModel, Field
 
 
+class EvidenceSourceItem(BaseModel):
+    """A source of evidence for a claim."""
+    source_type: str
+    evidence: str
+    source_reference: str | None = None
+
+
+class ClaimEvidenceItem(BaseModel):
+    """Evidence verification result for a single claim."""
+    claim: str
+    evidence_sources: list[EvidenceSourceItem]
+    verification_reasoning: str
+    status: Literal["Verified", "Partially Verified", "Unverified"]
+    confidence: float
+
+
 class AnalysisRequest(BaseModel):
     startup_name: str = Field(min_length=1, max_length=200)
     description: str = Field(min_length=1, max_length=5000)
@@ -15,6 +31,7 @@ class AnalysisResponse(BaseModel):
     analysis_id: str
     status: Literal["completed"]
     claims: list[str]
+    evidence_verification: list[ClaimEvidenceItem]
     competitors: list[str]
     risk_score: int
     risk_level: Literal["low", "medium", "high"]
@@ -32,6 +49,7 @@ class AnalysisRecord(BaseModel):
     risk_level: Literal["low", "medium", "high"]
     competitors: list[str]
     claims: list[str]
+    evidence_verification: list[ClaimEvidenceItem] = Field(default_factory=list)
     recommendation: Literal["Strong Buy", "Watchlist", "Proceed with Caution", "Reject"] = "Watchlist"
     confidence: float = 0.70
     rationale: list[str] = Field(

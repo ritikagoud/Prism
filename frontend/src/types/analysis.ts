@@ -4,6 +4,22 @@ export type AnalysisStatus = "completed" | "in_progress" | "queued" | "failed";
 
 export type RecommendationType = "Strong Buy" | "Watchlist" | "Proceed with Caution" | "Reject";
 
+export type EvidenceStatus = "Verified" | "Partially Verified" | "Unverified";
+
+export type EvidenceSource = {
+	source_type: string;
+	evidence: string;
+	source_reference?: string;
+};
+
+export type ClaimEvidence = {
+	claim: string;
+	evidence_sources: EvidenceSource[];
+	verification_reasoning: string;
+	status: EvidenceStatus;
+	confidence: number;
+};
+
 export type AnalysisSummary = {
 	id: string;
 	startupName: string;
@@ -23,6 +39,7 @@ export type AnalysisHistoryRecord = {
 	risk_level: ApiRiskLevel;
 	competitors: string[];
 	claims: string[];
+	evidence_verification: ClaimEvidence[];
 	recommendation: RecommendationType;
 	confidence: number;
 	rationale: string[];

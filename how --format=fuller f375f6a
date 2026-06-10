@@ -1,0 +1,10 @@
+[33m6c4ad7b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: migrate persistence layer to MongoDB Atlas
+[33ma10e0e7[m feat: add investment memo generator and report enhancements
+[33m82287b3[m Update README.md
+[33m730bd91[m feat: add investment committee agent and recommendation engine
+[33m2587de0[m docs: improve project documentation and README
+[33md967e36[m feat: add PDF text extraction and preview support
+[33m01d8e5c[m feat: add analysis report generation
+[33m878f6c2[m feat: connect dashboard to real analysis history
+[33m1f239d9[m feat: persist startup analysis results
+[33mdd31226[m feat: add analysis dashboard
