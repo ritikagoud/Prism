@@ -9,6 +9,8 @@ from app.agents.risk_agent import RiskAgent
 from app.models.analysis import AnalysisRecord, AnalysisRequest, AnalysisResponse
 from app.services.analysis_persistence import AnalysisPersistenceService
 from app.services.investment_memo_service import InvestmentMemoService
+from app.services.mongodb_analysis_persistence import MongoDBAnalysisPersistenceService
+from app.services.mongodb_service import MongoDBService
 
 
 @dataclass(slots=True)
@@ -22,6 +24,7 @@ class OrchestratorService:
 
     @classmethod
     def create_default(cls) -> "OrchestratorService":
+        """Create orchestrator with default JSON persistence."""
         return cls(
             claim_agent=ClaimAgent(),
             competitor_agent=CompetitorAgent(),
@@ -29,6 +32,19 @@ class OrchestratorService:
             investment_committee_agent=InvestmentCommitteeAgent(),
             investment_memo_service=InvestmentMemoService(),
             analysis_persistence=AnalysisPersistenceService.create_default(),
+        )
+    
+    @classmethod
+    def create_with_mongodb(cls, mongodb_service: MongoDBService) -> "OrchestratorService":
+        """Create orchestrator with MongoDB persistence."""
+        mongodb_persistence = MongoDBAnalysisPersistenceService(mongodb_service)
+        return cls(
+            claim_agent=ClaimAgent(),
+            competitor_agent=CompetitorAgent(),
+            risk_agent=RiskAgent(),
+            investment_committee_agent=InvestmentCommitteeAgent(),
+            investment_memo_service=InvestmentMemoService(),
+            analysis_persistence=AnalysisPersistenceService.create_with_mongodb(mongodb_persistence),
         )
 
     def run(self, request: AnalysisRequest) -> AnalysisResponse:

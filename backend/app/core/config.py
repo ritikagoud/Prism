@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     app_env: str = Field(default="development")
     api_v1_prefix: str = Field(default="/api/v1")
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    
+    # MongoDB Configuration
+    mongodb_uri: str = Field(default="mongodb://localhost:27017")
+    mongodb_database: str = Field(default="prism")
 
     @field_validator("cors_origins", mode="before")
     @classmethod
