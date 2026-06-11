@@ -128,6 +128,187 @@ export function AnalysisReportView({ analysisId }: AnalysisReportViewProps) {
 					</div>
 				) : analysis ? (
 					<>
+						{/* Agent Workflow Section */}
+						<div className="mt-8">
+							<div className="mb-2">
+								<h2 className="text-2xl font-semibold tracking-tight text-white">
+									Prism Agent Execution Trace
+								</h2>
+								<p className="mt-2 text-sm leading-6 text-slate-400">
+									Transparent view of how specialized AI agents collaborated to produce the final investment recommendation.
+								</p>
+							</div>
+							
+							<div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+								{/* Claim Extraction Agent */}
+								<div className="relative rounded-xl border border-white/10 bg-slate-900/50 p-4 backdrop-blur-sm">
+									<div className="absolute -right-2 top-1/2 h-0.5 w-4 bg-slate-700/50 hidden lg:block" />
+									<div className="mb-3 flex items-center justify-between">
+										<div className="flex items-center gap-2">
+											<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 border border-slate-700 text-slate-400">
+												<svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+												</svg>
+											</div>
+											<span className="text-xs font-medium uppercase tracking-wider text-slate-500">Step 1</span>
+										</div>
+										<div className="flex items-center gap-1 text-emerald-400">
+											<svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+												<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+											</svg>
+											<span className="text-xs font-medium">Completed</span>
+										</div>
+									</div>
+									<h3 className="text-sm font-semibold text-white mb-1">Claim Extraction Agent</h3>
+									<p className="text-2xl font-bold text-white mb-2">{analysis.claims.length}</p>
+									<p className="text-xs leading-relaxed text-slate-400">
+										Extracted {analysis.claims.length} startup {analysis.claims.length === 1 ? 'claim' : 'claims'} from pitch materials
+									</p>
+								</div>
+
+								{/* Evidence Verification Agent */}
+								<div className="relative rounded-xl border border-white/10 bg-slate-900/50 p-4 backdrop-blur-sm">
+									<div className="absolute -right-2 top-1/2 h-0.5 w-4 bg-slate-700/50 hidden lg:block" />
+									<div className="mb-3 flex items-center justify-between">
+										<div className="flex items-center gap-2">
+											<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 border border-slate-700 text-slate-400">
+												<svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+												</svg>
+											</div>
+											<span className="text-xs font-medium uppercase tracking-wider text-slate-500">Step 2</span>
+										</div>
+										<div className="flex items-center gap-1 text-emerald-400">
+											<svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+												<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+											</svg>
+											<span className="text-xs font-medium">Completed</span>
+										</div>
+									</div>
+									<h3 className="text-sm font-semibold text-white mb-1">Evidence Verification Agent</h3>
+									<div className="flex items-baseline gap-2 mb-2">
+										<p className="text-2xl font-bold text-white">
+											{analysis.evidence_verification.filter(e => e.status === "Verified").length}
+										</p>
+										<span className="text-xs text-slate-500">/</span>
+										<p className="text-lg font-semibold text-slate-400">
+											{analysis.evidence_verification.filter(e => e.status === "Partially Verified").length}
+										</p>
+										<span className="text-xs text-slate-500">/</span>
+										<p className="text-lg font-semibold text-slate-600">
+											{analysis.evidence_verification.filter(e => e.status === "Unverified").length}
+										</p>
+									</div>
+									<p className="text-xs leading-relaxed text-slate-400">
+										{analysis.evidence_verification.filter(e => e.status === "Verified").length} verified, {analysis.evidence_verification.filter(e => e.status === "Partially Verified").length} partially verified
+									</p>
+								</div>
+
+								{/* Competitor Research Agent */}
+								<div className="relative rounded-xl border border-white/10 bg-slate-900/50 p-4 backdrop-blur-sm">
+									<div className="absolute -right-2 top-1/2 h-0.5 w-4 bg-slate-700/50 hidden lg:block" />
+									<div className="mb-3 flex items-center justify-between">
+										<div className="flex items-center gap-2">
+											<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 border border-slate-700 text-slate-400">
+												<svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+												</svg>
+											</div>
+											<span className="text-xs font-medium uppercase tracking-wider text-slate-500">Step 3</span>
+										</div>
+										<div className="flex items-center gap-1 text-emerald-400">
+											<svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+												<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+											</svg>
+											<span className="text-xs font-medium">Completed</span>
+										</div>
+									</div>
+									<h3 className="text-sm font-semibold text-white mb-1">Competitor Research Agent</h3>
+									<p className="text-2xl font-bold text-white mb-2">{analysis.competitors.length}</p>
+									<p className="text-xs leading-relaxed text-slate-400">
+										Identified {analysis.competitors.length} {analysis.competitors.length === 1 ? 'competitor' : 'competitors'}
+									</p>
+								</div>
+
+								{/* Risk Assessment Agent */}
+								<div className="relative rounded-xl border border-white/10 bg-slate-900/50 p-4 backdrop-blur-sm">
+									<div className="absolute -right-2 top-1/2 h-0.5 w-4 bg-slate-700/50 hidden lg:block" />
+									<div className="mb-3 flex items-center justify-between">
+										<div className="flex items-center gap-2">
+											<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 border border-slate-700 text-slate-400">
+												<svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+												</svg>
+											</div>
+											<span className="text-xs font-medium uppercase tracking-wider text-slate-500">Step 4</span>
+										</div>
+										<div className="flex items-center gap-1 text-emerald-400">
+											<svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+												<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+											</svg>
+											<span className="text-xs font-medium">Completed</span>
+										</div>
+									</div>
+									<h3 className="text-sm font-semibold text-white mb-1">Risk Assessment Agent</h3>
+									<p className={`text-2xl font-bold mb-2 ${getRiskScoreAccentClass(analysis.risk_score)}`}>
+										{analysis.risk_score}
+									</p>
+									<p className="text-xs leading-relaxed text-slate-400 capitalize">
+										{analysis.risk_level} risk profile detected
+									</p>
+								</div>
+
+								{/* Investment Committee Agent */}
+								<div className="rounded-xl border border-white/10 bg-slate-900/50 p-4 backdrop-blur-sm">
+									<div className="mb-3 flex items-center justify-between">
+										<div className="flex items-center gap-2">
+											<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 border border-slate-700 text-slate-400">
+												<svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+												</svg>
+											</div>
+											<span className="text-xs font-medium uppercase tracking-wider text-slate-500">Step 5</span>
+										</div>
+										<div className="flex items-center gap-1 text-emerald-400">
+											<svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+												<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+											</svg>
+											<span className="text-xs font-medium">Completed</span>
+										</div>
+									</div>
+									<h3 className="text-sm font-semibold text-white mb-1">Investment Committee Agent</h3>
+									<div className="mb-2">
+										<RecommendationBadge recommendation={analysis.recommendation} />
+									</div>
+									<p className="text-xs leading-relaxed text-slate-400">
+										Recommended {analysis.recommendation} ({(analysis.confidence * 100).toFixed(0)}% confidence)
+									</p>
+								</div>
+							</div>
+							
+							{/* Workflow Summary Banner */}
+							<div className="mt-4 rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 backdrop-blur-sm">
+								<div className="flex items-start gap-3">
+									<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-slate-800 border border-slate-700">
+										<svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+										</svg>
+									</div>
+									<div className="flex-1">
+										<h4 className="text-sm font-semibold text-white mb-1">Agent Execution Summary</h4>
+										<p className="text-sm leading-relaxed text-slate-400">
+											Prism processed {analysis.startup_name} through 5 specialized AI agents. The workflow identified{' '}
+											<span className="font-medium text-slate-300">{analysis.claims.length} {analysis.claims.length === 1 ? 'claim' : 'claims'}</span>, verified supporting evidence from source materials, analyzed{' '}
+											<span className="font-medium text-slate-300">{analysis.competitors.length} {analysis.competitors.length === 1 ? 'competitor' : 'competitors'}</span>, assessed a{' '}
+											<span className={`font-medium ${getRiskScoreAccentClass(analysis.risk_score)}`}>{analysis.risk_level} risk profile</span>, and produced a{' '}
+											<span className="font-medium text-slate-300">{analysis.recommendation}</span> recommendation with{' '}
+											<span className="font-medium text-slate-300">{(analysis.confidence * 100).toFixed(0)}%</span> confidence.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
 						<div className="mt-8 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
 							<article className="rounded-[1.75rem] border border-white/10 bg-white/[0.05] p-6 backdrop-blur-xl">
 							<div className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-start sm:justify-between">
